@@ -1,0 +1,66 @@
+# FRESCO project config — every tunable decision lives here, not in code.
+# Change a number here, rerun the pipeline, no code edits needed.
+
+clusters:
+  S: "_S.parquet"       # suffix match
+  C: "_C.parquet"       # suffix match
+  Anvil: null           # no suffix — matched by exclusion in code
+
+# ------------------------------------------------------------------
+# LEAKAGE RULES (locked — see PROJECT_SPEC.md for the reasoning)
+# ------------------------------------------------------------------
+label_column: exitcode
+banned_feature_columns:      # never allowed into the feature table
+  - exitcode
+  - end_time
+
+positive_states: [FAILED, TIMEOUT, NODE_FAIL]   # label = 1
+negative_states: [COMPLETED]                     # label = 0
+dropped_states: [CANCELLED]                      # excluded from training entirely
+
+# ------------------------------------------------------------------
+# EARLY WINDOW RULE (v1 — flat % of the job's own timelimit)
+# ------------------------------------------------------------------
+window_pct: 10.0     # % of timelimit (minutes) counted as "early"
+                      # sweep candidates for validation: [5, 10, 15, 20]
+
+# ------------------------------------------------------------------
+# TELEMETRY VALUE COLUMNS TO AGGREGATE PER JOB
+# ------------------------------------------------------------------
+value_columns:
+  - value_cpuuser
+  - value_gpu
+  - value_memused
+  - value_memused_minus_diskcache
+  - value_nfs
+  - value_block
+
+aggregations: [mean, max, min, std, last, slope]
+
+# candidate features flagged for the correlation-study gate before being
+# trusted as safe (see Phase 3) — not banned, just not assumed safe yet
+candidate_features_to_validate:
+  - n_rows_in_window
+  - wait_time_sec
+
+  # ------------------------------------------------------------------
+# TIME-RESPECTING SPLIT (Phase 4) — mirrors the organizer's own
+# participant/validation chunk boundaries from data-chunk-info.txt,
+# rather than a random shuffle across years.
+# ------------------------------------------------------------------
+split_ranges:
+  S:
+    train_start: "2013-02-01"
+    train_end:   "2016-12-31"
+    val_start:   "2017-01-01"
+    val_end:     "2017-03-31"
+  C:
+    train_start: "2015-05-01"
+    train_end:   "2016-12-31"
+    val_start:   "2017-01-01"
+    val_end:     "2017-03-31"
+  Anvil:
+    train_start: "2022-07-01"
+    train_end:   "2023-02-28"
+    val_start:   "2023-03-01"
+    val_end:     "2023-03-31"

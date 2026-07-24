@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+
+# raw competition data -- never allowed in the repo per competition rules
+data/
+
+# large derived feature tables / splits / submission -- not required in
+# repo, and would blow past the 2GB cap; inference instructions in
+# README.md let organizers regenerate these from raw data + code
+outputs/*.csv
