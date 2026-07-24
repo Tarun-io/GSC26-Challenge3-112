@@ -3,8 +3,9 @@
 IEEE Computer Society 2026 Global Student Challenge.
 
 ## Team
-- [Your name(s) here]
-- [Kaggle username(s) here]
+- Tarun yepuri (Team Lead)
+- H. Praneeth Varma
+  
 
 ## Setup
 
